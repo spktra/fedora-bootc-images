@@ -16,7 +16,11 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v5
 
+      - name: Get current date for container tag timestamp
+        id: timestamp
+        run: "::set-output name=timestamp::$(date +'%Y-%m-%d')"
+
       - name: Build base container
-        run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-${{ steps.date.outputs.date }} --disable-compression=false base/
+        run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-${{ steps.timestamp.outputs.timestamp }} --disable-compression=false base/
       - name: push image to ghcr.io
         run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ghcr.io/spktra/fedora-bootc-base:42 ghcr.io/spktra/fedora-bootc-base:42
