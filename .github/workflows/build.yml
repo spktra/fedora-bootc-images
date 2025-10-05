@@ -3,7 +3,7 @@ name: build container -> fedora-bootc-base
 run-name: building container -> fedora-bootc-base
 on: 
   workflow_dispatch:
-  #push:
+  # push:
   # schedule:
   #   - cron: '30 13 * * FRI'    # Triggers Fri at 13:30
 
