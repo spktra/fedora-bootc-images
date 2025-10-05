@@ -18,7 +18,7 @@ jobs:
 
       - name: Get current date for container tag timestamp
         id: timestamp
-        run: "::set-output name=timestamp::$(date +'%Y-%m-%d')"
+        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d')"
 
       - name: Build base container
         run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-${{ steps.timestamp.outputs.timestamp }} --disable-compression=false base/
