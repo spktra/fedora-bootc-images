@@ -17,9 +17,30 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Get current date for container tag timestamp
-        run: echo "TIMESTAMP=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+        run: echo "TIMESTAMP=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
-      - name: Build base container
-        run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-$TIMESTAMP --disable-compression=false base/
-      - name: push image to ghcr.io
-        run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ghcr.io/spktra/fedora-bootc-base:42 ghcr.io/spktra/fedora-bootc-base:42
+      - name: Build Image
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ghcr.io/spktra/fedora-bootc-base
+          tags: 42 42-$TIMESTAMP
+          containerfiles: |
+            ./base/Containerfile
+
+      # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
+      # in which case 'username' and 'password' can be omitted.
+      - name: Push To ghcr.io
+        id: push-to-ghcr
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ghcr.io/spktra
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Build base container
+      #   run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-$TIMESTAMP --disable-compression=false base/
+      # - name: push image to ghcr.io
+      #   run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ghcr.io/spktra/fedora-bootc-base:42 ghcr.io/spktra/fedora-bootc-base:42
