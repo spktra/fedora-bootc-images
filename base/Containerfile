@@ -1,0 +1,39 @@
+# Container Base
+FROM quay.io/fedora/fedora-bootc:42
+
+# SETUP FILESYSTEM
+RUN mkdir /var/roothome && \
+    ostree container commit
+
+# INSTALL REPOS
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    dnf -y install dnf5-plugins && \
+    dnf config-manager addrepo --from-repofile=https://pkgs.tailscale.com/stable/fedora/tailscale.repo && \
+    ostree container commit
+
+# INSTALL PACKAGES
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    dnf -y install \
+        tailscale \
+        wireguard-tools \
+        vim \
+        cloud-init && \
+    ostree container commit
+
+# Delete not needed packages and cleanup
+RUN --mount=type=cache,dst=/var/cache \
+    --mount=type=cache,dst=/var/log \
+    --mount=type=tmpfs,dst=/tmp \
+    dnf -y remove \
+        iptables-services \
+        iptables-utils && \
+    dnf -y autoremove && \
+    dnf clean all && \
+    ostree container commit
+
+# CLEAN & CHECK
+RUN bootc container lint

@@ -1,0 +1,22 @@
+---
+name: build container -> fedora-bootc-base
+run-name: building container -> fedora-bootc-base
+on: 
+  workflow_dispatch:
+  #push:
+  # schedule:
+  #   - cron: '30 13 * * FRI'    # Triggers Fri at 13:30
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v5
+
+      - name: Build base container
+        run: podman build -t ghcr.io/spktra/fedora-bootc-base:42 -t ghcr.io/spktra/fedora-bootc-base:42-${{ steps.date.outputs.date }} --disable-compression=false base/
+      - name: push image to ghcr.io
+        run: podman push --creds=${{ github.actor }}:${{ secrets.GITHUB_TOKEN }} ghcr.io/spktra/fedora-bootc-base:42 ghcr.io/spktra/fedora-bootc-base:42
