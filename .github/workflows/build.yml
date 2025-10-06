@@ -28,7 +28,7 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: fedora-bootc-base
+          image: fedora-bootc-${{ matrix.images }}
           tags: ${{ matrix.fedora_version }} ${{ matrix.fedora_version }}-${{ steps.timestamp.outputs.timestamp }}
           containerfiles: |
             ./${{ matrix.fedora_version }}/${{ matrix.images }}/Containerfile
