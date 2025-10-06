@@ -4,8 +4,8 @@ run-name: building container -> fedora-bootc-base
 on: 
   workflow_dispatch:
   # push:
-  # schedule:
-  #   - cron: '30 13 * * FRI'    # Triggers Fri at 13:30
+  schedule:
+    - cron: "0 22 * * *"
 
 jobs:
   build-image:
