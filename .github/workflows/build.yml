@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+    strategy:
+      matrix:
+        fedora_version: [42]
+        images: [base]
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v5
@@ -24,10 +28,10 @@ jobs:
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ghcr.io/spktra/fedora-bootc-base
-          tags: 42 42-${{ steps.timestamp.outputs.timestamp }}
+          image: fedora-bootc-base
+          tags: ${{ matrix.fedora_version }} ${{ matrix.fedora_version }}-${{ steps.timestamp.outputs.timestamp }}
           containerfiles: |
-            ./base/Containerfile
+            ./${{ matrix.fedora_version }}/${{ matrix.images }}/Containerfile
 
       # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
       # in which case 'username' and 'password' can be omitted.
